@@ -1,19 +1,25 @@
-name: Debug Terraform (OIDC)
+name: Terraform (Azure OIDC)
 
 on:
+  pull_request:
+    paths:
+      - "Infra/terraform/**"
+
   push:
     branches:
       - main
     paths:
       - "Infra/terraform/**"
+
   workflow_dispatch: {}
 
 permissions:
   contents: read
-  id-token: write
+  id-token: write   # REQUIRED for Azure OIDC
 
 jobs:
-  debug:
+  terraform:
+    name: Terraform Plan / Apply
     runs-on: ubuntu-latest
 
     defaults:
@@ -25,24 +31,38 @@ jobs:
       ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
       ARM_USE_OIDC: true
+      TF_IN_AUTOMATION: true
 
     steps:
-      - name: Checkout repo
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
 
+      # ---- AUTH VERIFICATION (OIDC) ----
+      - name: Verify OIDC Context
+        run: |
+          echo "ARM_USE_OIDC=$ARM_USE_OIDC"
+          echo "OIDC URL=$ACTIONS_ID_TOKEN_REQUEST_URL"
+          echo "OIDC AUD=$ACTIONS_ID_TOKEN_REQUEST_TOKEN"
+
+      # ---- INIT ----
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -input=false
 
+      # ---- VALIDATE ----
       - name: Terraform Validate
         run: terraform validate
 
+      # ---- PLAN (PR + non-main) ----
       - name: Terraform Plan
-        run: terraform plan
-        
-      - name: Verify OIDC context
-        run: |
-          echo "ARM_USE_OIDC=$ARM_USE_OIDC"
-          echo "OIDC token file: $ACTIONS_ID_TOKEN_REQUEST_URL"
+        if: github.event_name == 'pull_request'
+        run: terraform plan -input=false
+
+      # ---- APPLY (ONLY MERGE TO MAIN) ----
+      - name: Terraform Apply
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve -input=false
