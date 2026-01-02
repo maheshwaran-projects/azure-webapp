@@ -1,4 +1,4 @@
-# keyvault.tf
+# keyvault.tf - KEEP THIS DECLARATION
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_key_vault" "kv" {
@@ -41,11 +41,6 @@ resource "azurerm_key_vault" "kv" {
   tags = {
     environment = "production"
   }
-
-  depends_on = [
-    azurerm_resource_group.rg,
-    azurerm_kubernetes_cluster.aks
-  ]
 }
 
 # Generate random passwords
