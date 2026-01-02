@@ -41,12 +41,30 @@ resource "azurerm_key_vault" "kv" {
   tags = {
     environment = "production"
   }
+
+  depends_on = [
+    azurerm_resource_group.rg,
+    azurerm_kubernetes_cluster.aks
+  ]
 }
 
-# Create secrets with initial values (you'll update these manually first)
+# Generate random passwords
+resource "random_password" "appgw_cert" {
+  length           = 32
+  special          = true
+  override_special = "!@#$%&*()-_=+[]{}<>:?"
+}
+
+resource "random_password" "sql_admin" {
+  length           = 32
+  special          = true
+  override_special = "!@#$%&*()-_=+[]{}<>:?"
+}
+
+# Store generated passwords in Key Vault
 resource "azurerm_key_vault_secret" "appgw_cert_password" {
   name         = "appgw-cert-password"
-  value        = "ChangeMe123!"  # You'll update this manually after creation
+  value        = random_password.appgw_cert.result
   key_vault_id = azurerm_key_vault.kv.id
 
   depends_on = [azurerm_key_vault.kv]
@@ -54,7 +72,7 @@ resource "azurerm_key_vault_secret" "appgw_cert_password" {
 
 resource "azurerm_key_vault_secret" "sql_admin_password" {
   name         = "sql-admin-password"
-  value        = "ChangeMe123!"  # You'll update this manually after creation
+  value        = random_password.sql_admin.result
   key_vault_id = azurerm_key_vault.kv.id
 
   depends_on = [azurerm_key_vault.kv]
