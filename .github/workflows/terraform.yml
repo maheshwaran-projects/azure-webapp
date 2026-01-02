@@ -1,25 +1,18 @@
-name: Terraform Azure Infra
+name: Debug Terraform
 
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - "Infra/terraform/**"
-  workflow_dispatch: {}    
+on: [workflow_dispatch]
 
 permissions:
   contents: read
 
 jobs:
-  terraform:
+  debug:
     runs-on: ubuntu-latest
 
     defaults:
       run:
         working-directory: Infra/terraform
 
-    # CRITICAL: Set these environment variables
     env:
       ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
@@ -30,69 +23,26 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v4
 
+    - name: Display Configuration
+      run: |
+        echo "=== Your Configuration Files ==="
+        echo "1. backend.tf:"
+        cat backend.tf
+        echo ""
+        echo "2. providers.tf:"
+        cat providers.tf
+        echo ""
+        echo "3. Environment Variables:"
+        echo "   ARM_CLIENT_ID: ${ARM_CLIENT_ID:0:10}..."
+        echo "   ARM_CLIENT_SECRET: ${ARM_CLIENT_SECRET:0:10}..."
+        echo "   ARM_TENANT_ID: ${ARM_TENANT_ID}"
+        echo "   ARM_SUBSCRIPTION_ID: ${ARM_SUBSCRIPTION_ID}"
+
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: 1.7.5
 
-    - name: Create or Update provider configuration
+    - name: Test Terraform Init
       run: |
-        echo "=== Creating explicit provider configuration ==="
-        
-        # Create providers.tf with explicit Service Principal config
-        cat > providers.tf << EOF
-terraform {
-  required_version = ">= 1.5.0"
-  
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 4.0"
-    }
-  }
-  
-  backend "azurerm" {
-    resource_group_name  = "rg-tfstate-prod"
-    storage_account_name = "tfstatequote525"
-    container_name       = "tfstate"
-    key                  = "quote-app/production.tfstate"
-  }
-}
-
-# Explicit Service Principal configuration
-provider "azurerm" {
-  features {}
-  
-  # Service Principal authentication
-  client_id       = "${{ secrets.ARM_CLIENT_ID }}"
-  client_secret   = "${{ secrets.ARM_CLIENT_SECRET }}"
-  tenant_id       = "${{ secrets.ARM_TENANT_ID }}"
-  subscription_id = "${{ secrets.ARM_SUBSCRIPTION_ID }}"
-  
-  # Disable Azure CLI auth fallback
-  skip_provider_registration = false
-  use_msi                    = false
-  use_azuread_auth           = false
-}
-EOF
-        
-        echo "=== Created providers.tf ==="
-        cat providers.tf
-
-    - name: Clean Terraform cache
-      run: |
-        echo "Cleaning Terraform cache..."
-        rm -rf .terraform .terraform.lock.hcl terraform.tfstate 2>/dev/null || true
-
-    - name: Terraform Init
-      run: terraform init -input=false
-
-    - name: Terraform Validate
-      run: terraform validate
-
-    - name: Terraform Plan
-      run: terraform plan -input=false
-
-    - name: Terraform Apply
-      if: github.ref == 'refs/heads/main'
-      run: terraform apply -auto-approve -input=false
+        echo "=== Testing terraform init ==="
+        rm -rf .terraform .terraform.lock.hcl 2>/dev/null || true
+        terraform init -input=false
