@@ -8,7 +8,7 @@ resource "azurerm_mssql_server" "sql" {
 
   # Temporary SQL admin (will be removed later)
   administrator_login          = "sqladminuser"
-  administrator_login_password = "P@ssword123!" # move to Key Vault later
+  administrator_login_password = azurerm_key_vault_secret.sql_admin_password.value
 
   # SECURITY: Disable public access
   public_network_access_enabled = false
@@ -41,3 +41,4 @@ resource "azurerm_mssql_database" "db" {
     read   = "10m"
   }
 }
+
