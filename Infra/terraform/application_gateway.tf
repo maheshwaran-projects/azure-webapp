@@ -99,10 +99,12 @@ resource "azurerm_application_gateway" "appgw" {
 
   ssl_certificate {
     name     = "appgw-cert"
-    key_vault_secret_id = azurerm_key_vault_certificate.appgw.secret_id
-  }
+    data     = data.azurerm_key_vault_secret.appgw_certificate_base64.value
+    password = data.azurerm_key_vault_secret.appgw_cert_password.value
+  }   
 
 }
+
 
 
 
