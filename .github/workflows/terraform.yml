@@ -50,6 +50,28 @@ jobs:
           echo "OIDC URL=$ACTIONS_ID_TOKEN_REQUEST_URL"
           echo "OIDC AUD=$ACTIONS_ID_TOKEN_REQUEST_TOKEN"
 
+      - name: Debug OIDC Token Claims
+        run: |
+          echo "=== Debug OIDC Token ==="
+          echo "OIDC URL: $ACTIONS_ID_TOKEN_REQUEST_URL"
+    
+          # Request token with Azure audience
+          TOKEN_RESPONSE=$(curl -s -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=api://AzureADTokenExchange")
+    
+          echo "Token Response:"
+          echo "$TOKEN_RESPONSE" | jq .
+    
+          # Extract and decode JWT payload
+          TOKEN=$(echo "$TOKEN_RESPONSE" | jq -r '.value')
+          if [ "$TOKEN" != "null" ]; then
+            echo "=== Decoded Token Payload ==="
+            echo $TOKEN | cut -d '.' -f 2 | base64 -d 2>/dev/null | jq .
+          else
+            echo "ERROR: No token received"
+          fi
+        env:
+          ACTIONS_ID_TOKEN_REQUEST_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       # ---- INIT ----
       - name: Terraform Init
         #run: terraform init -input=false
