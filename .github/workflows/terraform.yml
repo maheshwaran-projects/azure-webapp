@@ -74,8 +74,8 @@ jobs:
 
       # ---- INIT ----
       - name: Terraform Init
-        #run: terraform init -input=false
-        run: terraform init -input=false -upgrade -no-color -lock=false -get-plugins=true -verbose
+        run: terraform init -input=false
+        #run: terraform init -input=false -upgrade -no-color -lock=false -get-plugins=true -verbose
 
       # ---- VALIDATE ----
       - name: Terraform Validate
