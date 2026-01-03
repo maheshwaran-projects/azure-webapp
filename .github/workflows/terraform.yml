@@ -19,6 +19,7 @@ jobs:
   terraform:
     name: Terraform Plan / Apply
     runs-on: ubuntu-latest
+    environment: pr-workflow 
     timeout-minutes: 30 
 
     defaults:
