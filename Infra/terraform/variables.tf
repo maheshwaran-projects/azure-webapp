@@ -17,3 +17,9 @@ variable "create_local_key_vault" {
   type        = bool
   default     = false
 }
+
+variable "github_sp_client_id" {
+  description = "Azure AD Application (Client ID) used by GitHub Actions OIDC"
+  type        = string
+}
+
