@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quote-app
+  namespace: quote-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: quote-app
+  template:
+    metadata:
+      labels:
+        app: quote-app
+    spec:
+      containers:
+      - name: quote-app
+        image: quoteacr61ea8273.azurecr.io/quote-app:v1
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SQL_SERVER
+          valueFrom:
+            configMapKeyRef:
+              name: sql-config
+              key: SQL_SERVER
+        - name: SQL_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              name: sql-config
+              key: SQL_DATABASE
+

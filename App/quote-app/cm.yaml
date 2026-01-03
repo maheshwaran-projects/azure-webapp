@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sql-config
+  namespace: quote-app
+data:
+  SQL_SERVER: sql-quote-61ea8273.privatelink.database.windows.net
+  SQL_DATABASE: quotedb
+
