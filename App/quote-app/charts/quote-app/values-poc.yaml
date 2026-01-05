@@ -1,16 +1,32 @@
-# POC Environment values
+# values-poc.yaml - CORRECTED VERSION
+replicaCount: 2
 
-# Application
-app:
-  replicas: 2
-
-# Image
 image:
   repository: quoteacr60b19794.azurecr.io/quote-app
-  tag: v1
+  tag: "v1"
   pullPolicy: Always
 
-# Resources
+imagePullSecrets:
+  - name: acr-secret
+
+service:
+  name: quote-app-internal
+  type: ClusterIP
+  port: 8080
+  targetPort: 8080
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/use-regex: "true"
+  paths:
+    - path: /quote
+      pathType: Prefix
+    - path: /healthz
+      pathType: Prefix
+
 resources:
   requests:
     memory: "128Mi"
@@ -19,27 +35,23 @@ resources:
     memory: "256Mi"
     cpu: "500m"
 
-# Database
+autoscaling:
+  enabled: false
+
 database:
   sqlServer: "sql-quote-60b19794.privatelink.database.windows.net"
   sqlDatabase: "quotedb"
 
-# Ingress (enabled by default in template)
+env:
+  APP_NAME: "quote-app"
+  FLASK_DEBUG: "false"
 
-# Autoscaling
-autoscaling:
-  enabled: false
-  minReplicas: 3
-  maxReplicas: 10
-  targetCPU: 70
-  targetMemory: 80
-
-# Network Policy
-networkPolicy:
-  enabled: true
-  sqlServerCIDR: "10.10.2.0/24"
-  acrCIDR: "52.136.0.0/14"
-
-# Namespace
-namespace:
-  name: quote-app
+probes:
+  liveness:
+    path: /healthz
+    initialDelaySeconds: 30
+    periodSeconds: 10
+  readiness:
+    path: /ready
+    initialDelaySeconds: 5
+    periodSeconds: 5
