@@ -7,7 +7,7 @@ import traceback
 import logging
 from datetime import datetime, timedelta
 
-## Configure logging
+# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -145,17 +145,14 @@ def get_quote():
         if row:
             logger.info(f"Quote retrieved in {response_time:.0f}ms")
             return jsonify({
-                "quote": row[0],
-                "author": row[1],
-                "server": server,
+                row[1]: row[0],  # Author as key, quote as value
                 "response_time_ms": response_time
             })
         else:
             logger.warning("No quotes found in database")
             return jsonify({
                 "error": "No quotes found",
-                "message": "The quotes table is empty",
-                "server": server
+                "message": "The quotes table is empty"
             }), 404
 
     except pyodbc.Error as e:
@@ -165,8 +162,6 @@ def get_quote():
             "message": str(e),
             "sqlstate": getattr(e, 'sqlstate', 'N/A'),
             "error_code": getattr(e, 'error_code', 'N/A'),
-            "server": server,
-            "database": database,
             "timestamp": datetime.now().isoformat()
         }
         return jsonify(error_details), 500
@@ -176,8 +171,6 @@ def get_quote():
         error_details = {
             "error": "Application error",
             "message": str(e),
-            "server": server,
-            "database": database,
             "timestamp": datetime.now().isoformat()
         }
         return jsonify(error_details), 500
@@ -311,12 +304,62 @@ def metrics():
         "endpoints": ["/", "/health", "/test/connection", "/metrics"]
     })
 
+# ============================================
+# KUBERNETES PROBE ENDPOINTS
+# ============================================
+
+@app.route("/healthz")
+def healthz():
+    """Kubernetes liveness probe endpoint (lightweight)"""
+    try:
+        # Quick check - just verify Flask is running
+        return jsonify({
+            "status": "healthy",
+            "service": app_name,
+            "endpoint": "liveness",
+            "timestamp": datetime.now().isoformat()
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "status": "unhealthy",
+            "error": str(e),
+            "endpoint": "liveness"
+        }), 500
+
+@app.route("/ready")
+def ready():
+    """Kubernetes readiness probe endpoint (checks database)"""
+    try:
+        # Check database connection for readiness
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT 1")
+        cursor.fetchone()
+        conn.close()
+
+        return jsonify({
+            "status": "ready",
+            "service": app_name,
+            "database": "connected",
+            "endpoint": "readiness",
+            "timestamp": datetime.now().isoformat()
+        }), 200
+    except Exception as e:
+        logger.warning(f"Readiness probe failed: {e}")
+        return jsonify({
+            "status": "not_ready",
+            "service": app_name,
+            "database": "disconnected",
+            "error": str(e),
+            "endpoint": "readiness"
+        }), 503
+
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({
         "error": "Not found",
         "message": "The requested endpoint does not exist",
-        "available_endpoints": ["/", "/health", "/test/connection", "/metrics"]
+        "available_endpoints": ["/", "/health", "/test/connection", "/metrics", "/healthz", "/ready"]
     }), 404
 
 @app.errorhandler(500)
