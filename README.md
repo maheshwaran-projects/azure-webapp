@@ -41,7 +41,7 @@ graph TB
     ACR[Azure Container Registry]:::azure
     
     %% Connections
-    INTERNET -- "HTTPS/HTTP<br/>https://quoteapp.centralindia.cloudapp.azure.com/quote" --> AGW
+    INTERNET -- "HTTPS<br/>https://quoteapp.centralindia.cloudapp.azure.com/quote" --> AGW
     AGW -- "Internal HTTP<br/>Port 80" --> LB
     
     %% Health Probe Flow (CORRECTED)
