@@ -21,7 +21,7 @@ graph TB
     AGW[Application Gateway<br/>WAF_v2<br/>Public IP: XX.XX.XX.XX]:::agw
     
     %% Internal Load Balancer
-    LB[Internal Load Balancer<br/>Private IP: 10.224.0.5<br/>Port: 80]:::lb
+    LB[Internal Load Balancer]:::lb
     
     %% Kubernetes Layer
     subgraph "Azure Kubernetes Service (AKS)"
