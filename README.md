@@ -18,7 +18,7 @@ graph TB
     INTERNET[External Users]:::internet
     
     %% Application Gateway Layer
-    AGW[Application Gateway<br/>WAF_v2<br/>Public IP: XX.XX.XX.XX]:::agw
+    AGW[Application Gateway<br/>WAF_v2<br/>]:::agw
     
     %% Internal Load Balancer
     LB[Internal Load Balancer]:::lb
