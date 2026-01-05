@@ -23,7 +23,7 @@
 | **Everything hosted in Azure** | ✅ 100% Azure | Terraform-managed infrastructure |
 | **Provisioned using Terraform** | ✅ Git action | Complete Infrastructure as Code |
 | **AI tools used** | ✅ Documented | ChatGPT for documentation |
-| ** Quote application** | ✅ Documented | Managed by helm and argo-cd |
+| **Quote application** | ✅ Documented | Managed by helm and argo-cd |
 
 
 # Architecture
