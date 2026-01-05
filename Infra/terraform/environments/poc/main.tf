@@ -1,7 +1,35 @@
+terraform {
+  required_version = ">= 1.5.0"
+  
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 4.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
+  }
+
+  backend "azurerm" {
+    resource_group_name  = "rg-tfstate-vault"
+    storage_account_name = "tfstatequote525"
+    container_name       = "tfstate"
+    key                  = "quote-app/production.terraform.tfstate"
+  }
+}
+
+provider "azurerm" {
+  features {}
+}
+
+provider "random" {}
+
 module "quote_app" {
   source = "../../"
 
-  environment = "poc"
+  environment = "production"
   location    = "centralindia"
   resource_group_name = "rg-quote-app-prod"
 
@@ -40,7 +68,7 @@ module "quote_app" {
     zones         = ["1", "2", "3"]
     enable_waf    = true
     waf_mode      = "Prevention"
-    domain_name   = "quoteapp-prod.centralindia.cloudapp.azure.com"
+    domain_name   = "quoteapp.centralindia.cloudapp.azure.com"
     enable_http2  = true
   }
 }
