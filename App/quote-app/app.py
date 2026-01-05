@@ -7,7 +7,7 @@ import traceback
 import logging
 from datetime import datetime, timedelta
 
-# Configure logging
+# Configure logging #
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
