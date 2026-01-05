@@ -64,7 +64,7 @@ jobs:
         run: |
           cd App/quote-app
           docker build -f docker/Dockerfile \
-            -t ${{ env.ACR_REGISTRY }}/${{ env.APP_NAME }}:${{ env.IMAGE_TAG }} .
+            -t ${{ env.ACR_REGISTRY }}/${{ env.APP_NAME }}:${{ env.IMAGE_TAG }} src/
           docker tag \
             ${{ env.ACR_REGISTRY }}/${{ env.APP_NAME }}:${{ env.IMAGE_TAG }} \
             ${{ env.ACR_REGISTRY }}/${{ env.APP_NAME }}:latest
