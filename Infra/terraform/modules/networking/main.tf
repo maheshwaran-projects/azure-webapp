@@ -13,31 +13,12 @@ resource "azurerm_subnet" "subnets" {
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = each.value.address_prefixes
-
-  dynamic "delegation" {
-    for_each = each.value.delegation != null ? [each.value.delegation] : []
-    content {
-      name = delegation.value.name
-      service_delegation {
-        name    = delegation.value.service
-        actions = delegation.value.actions
-      }
-    }
-  }
-
-  service_endpoints = each.value.service_endpoints
-
-  lifecycle {
-    ignore_changes = [
-      enforce_private_link_endpoint_network_policies,
-      enforce_private_link_service_network_policies
-    ]
-  }
+  
+  service_endpoints = lookup(each.value, "service_endpoints", [])
 }
 
-# Network Security Groups if needed
 resource "azurerm_network_security_group" "nsg" {
-  for_each = { for k, v in var.subnets : k => v if v.nsg_rules != null }
+  for_each = { for k, v in var.subnets : k => v if lookup(v, "create_nsg", false) }
 
   name                = "nsg-${each.key}"
   location            = var.location
@@ -46,7 +27,7 @@ resource "azurerm_network_security_group" "nsg" {
 }
 
 resource "azurerm_subnet_network_security_group_association" "nsg_assoc" {
-  for_each = { for k, v in var.subnets : k => v if v.nsg_rules != null }
+  for_each = { for k, v in var.subnets : k => v if lookup(v, "create_nsg", false) }
 
   subnet_id                 = azurerm_subnet.subnets[each.key].id
   network_security_group_id = azurerm_network_security_group.nsg[each.key].id
