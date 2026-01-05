@@ -149,5 +149,5 @@ gh secret set AZURE_SUBSCRIPTION_ID  -b"$SUB_ID"  --repo "$REPO"
 gh secret set AZURE_TENANT_ID        -b"$TENANT_ID" --repo "$REPO"
 
 echo
-echo "✅ OIDC setup completed successfully!"
+echo "OIDC setup completed successfully!"
 

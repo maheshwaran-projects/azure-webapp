@@ -21,9 +21,9 @@ if ! az keyvault show --name "$KV_NAME" --resource-group "$RG_NAME" > /dev/null 
         --location "$LOCATION" \
         --sku standard \
         --enable-rbac-authorization false
-    echo "✅ Key Vault created"
+    echo "Key Vault created"
 else
-    echo "✅ Key Vault already exists"
+    echo "Key Vault already exists"
 fi
 
 echo -e "\n2. Storing passwords..."
@@ -44,7 +44,7 @@ az keyvault secret set \
     --name "sql-admin-password" \
     --value "$SQL_PASS"
 
-echo "✅ Passwords stored"
+echo "Passwords stored"
 
 echo -e "\n3. Uploading certificate..."
 
@@ -56,12 +56,12 @@ if [ -f "$CERT_PATH" ]; then
         --vault-name "$KV_NAME" \
         --name "appgw-certificate-base64" \
         --value "$CERT_BASE64"
-    echo "✅ Certificate uploaded"
+    echo "Certificate uploaded"
 else
-    echo "⚠ Certificate not found at: $CERT_PATH"
+    echo "Certificate not found at: $CERT_PATH"
 fi
 
-echo -e "\n✅ SETUP COMPLETE"
+echo -e "\n SETUP COMPLETE"
 echo "Key Vault: $KV_NAME"
 echo "Cert Password: $CERT_PASS"
 echo "SQL Password: $SQL_PASS"

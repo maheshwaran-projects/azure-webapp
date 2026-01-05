@@ -72,5 +72,5 @@ az role assignment create \
   --assignee "$CLIENT_ID" \
   --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$TFSTATE_RG/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT_NAME"
 
-echo "✅ Terraform state backend ready"
+echo "Terraform state backend ready"
 

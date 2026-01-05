@@ -74,14 +74,14 @@ jobs:
 
       - name: Print image details
         run: |
-          echo "✅ Image built and pushed successfully!"
+          echo "Image built and pushed successfully!"
           echo ""
-          echo "📦 Registry: ${{ env.ACR_REGISTRY }}"
-          echo "📁 Repository: ${{ env.APP_NAME }}"
-          echo "🏷️  Tag: ${{ env.IMAGE_TAG }}"
-          echo "🔗 Image: ${{ env.ACR_REGISTRY }}/${{ env.APP_NAME }}:${{ env.IMAGE_TAG }}"
+          echo "Registry: ${{ env.ACR_REGISTRY }}"
+          echo "Repository: ${{ env.APP_NAME }}"
+          echo "Tag: ${{ env.IMAGE_TAG }}"
+          echo "Image: ${{ env.ACR_REGISTRY }}/${{ env.APP_NAME }}:${{ env.IMAGE_TAG }}"
           echo ""
-          echo "📊 Metadata:"
+          echo "Metadata:"
           echo "  - Commit: ${{ github.sha }}"
           echo "  - Timestamp: $(date)"
           echo "  - Run: #${{ github.run_number }}"
@@ -96,25 +96,25 @@ jobs:
       
       - name: Update Helm values with new tag
         run: |
-          echo "🔄 Updating Helm values files..."
+          echo "Updating Helm values files..."
           
           cd App/quote-app/charts/quote-app
           
           # Update all values files
           for file in values-*.yaml values.yaml; do
             if [ -f "$file" ]; then
-              echo "📄 Updating $file..."
+              echo "Updating $file..."
               
               # Update image tag
               if grep -q "tag:" "$file"; then
                 sed -i "s|tag: \".*\"|tag: \"${{ env.IMAGE_TAG }}\"|" "$file"
-                echo "  ✅ Updated tag to: ${{ env.IMAGE_TAG }}"
+                echo "Updated tag to: ${{ env.IMAGE_TAG }}"
               fi
               
               # Update repository if specified
               if grep -q "repository:" "$file"; then
                 sed -i "s|repository: .*|repository: ${{ env.ACR_REGISTRY }}/${{ env.APP_NAME }}|" "$file"
-                echo "  ✅ Updated repository to: ${{ env.ACR_REGISTRY }}/${{ env.APP_NAME }}"
+                echo "Updated repository to: ${{ env.ACR_REGISTRY }}/${{ env.APP_NAME }}"
               fi
               
               echo ""
@@ -130,18 +130,18 @@ jobs:
           
           # Check if there are changes
           if git diff --quiet; then
-            echo "✅ No changes to commit"
+            echo "No changes to commit"
           else
             # Commit directly to main (for GitOps)
             git add values*.yaml
             git commit -m "chore: update image tag to ${{ env.IMAGE_TAG }}"
             git push
-            echo "✅ Changes pushed to repository"
+            echo "Changes pushed to repository"
             
             echo ""
-            echo "📋 Summary:"
-            echo "  Image: ${{ env.ACR_REGISTRY }}/${{ env.APP_NAME }}:${{ env.IMAGE_TAG }}"
-            echo "  Commit: ${{ github.sha }}"
-            echo "  Updated files:"
+            echo "Summary:"
+            echo "Image: ${{ env.ACR_REGISTRY }}/${{ env.APP_NAME }}:${{ env.IMAGE_TAG }}"
+            echo "Commit: ${{ github.sha }}"
+            echo "Updated files:"
             git show --name-only --oneline HEAD | tail -n +2
           fi
