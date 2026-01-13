@@ -12,8 +12,8 @@ imagePullSecrets:
 service:
   name: quote-app-internal
   type: ClusterIP
-  port: 8080
-  targetPort: 8080
+  port: 80
+  targetPort: 80
 
 ingress:
   enabled: true
