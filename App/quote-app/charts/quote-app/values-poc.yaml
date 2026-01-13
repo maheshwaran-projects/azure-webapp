@@ -20,11 +20,11 @@ ingress:
   className: nginx
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
   paths:
-    - path: ^/quote(/|$)(.*)
+    - path: /quote/?(.*)
       pathType: ImplementationSpecific
-    - path: ^/healthz(/|$)(.*)
+    - path: /healthz/?(.*)
       pathType: ImplementationSpecific
 
 resources:
