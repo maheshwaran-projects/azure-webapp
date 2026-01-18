@@ -5,7 +5,7 @@ set -e
 
 echo "=== Azure Secrets Setup (RBAC Mode) ==="
 
-KV_NAME="kv-quote-app-vault"
+KV_NAME="kv-quote-app-vault1"
 RG_NAME="rg-tfstate-vault"
 LOCATION="centralindia"
 
