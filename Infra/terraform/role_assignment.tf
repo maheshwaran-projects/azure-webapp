@@ -43,7 +43,6 @@ resource "azurerm_role_assignment" "aks_contributor_rg" {
   ]
 }
 
-data "azurerm_client_config" "current" {}
 
 resource "azurerm_role_assignment" "kv_secrets_user" {
   scope                = azurerm_key_vault.kv.id
