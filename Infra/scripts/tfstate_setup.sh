@@ -33,7 +33,7 @@ az storage account create \
   --name "$STORAGE_ACCOUNT_NAME" \
   --resource-group "$TFSTATE_RG" \
   --location "$LOCATION" \
-  --sku Standard_LRS \
+  --sku Standard_ZRS \
   --kind StorageV2 \
   --https-only true \
   --allow-blob-public-access false

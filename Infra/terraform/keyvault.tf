@@ -9,7 +9,7 @@ data "azurerm_client_config" "current" {}
 ############################################
 # This Key Vault already exists and stores shared / infra secrets
 data "azurerm_key_vault" "secrets" {
-  name                = "kv-quote-app-vault"
+  name                = "kv-quote-app-vault1"
   resource_group_name = "rg-tfstate-vault"
 }
 
@@ -45,12 +45,12 @@ data "azurerm_key_vault_secret" "appgw_cert_password" {
   ]
 }
 
-data "azurerm_key_vault_secret" "sql_admin_password" {
-  name         = "sql-admin-password"
-  key_vault_id = data.azurerm_key_vault.secrets.id
-
-  depends_on = [
-    azurerm_key_vault_access_policy.terraform_read
-  ]
-}
+#data "azurerm_key_vault_secret" "sql_admin_password" {
+#  name         = "sql-admin-password"
+#  key_vault_id = data.azurerm_key_vault.secrets.id
+#
+ # depends_on = [
+  #  azurerm_key_vault_access_policy.terraform_read
+ # ]
+#}
 
