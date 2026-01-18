@@ -114,6 +114,31 @@ else
     echo "Contributor role assignment already exists."
 fi
 
+
+# -----------------------------------------------------------------------------
+# Role Assignment: User Access Administrator (Subscription Scoped)
+# -----------------------------------------------------------------------------
+
+echo "Checking User Access Administrator role assignment..."
+
+UA_ROLE_EXISTS=$(az role assignment list \
+  --assignee-object-id "$SP_ID" \
+  --scope "/subscriptions/$SUB_ID" \
+  --query "[?roleDefinitionName=='User Access Administrator'] | length(@)" \
+  -o tsv)
+
+if [[ "$UA_ROLE_EXISTS" == "0" ]]; then
+    echo "Creating User Access Administrator role assignment at subscription scope..."
+    az role assignment create \
+      --assignee-object-id "$SP_ID" \
+      --assignee-principal-type ServicePrincipal \
+      --role "User Access Administrator" \
+      --scope "/subscriptions/$SUB_ID"
+else
+    echo "User Access Administrator role assignment already exists."
+fi
+
+
 # -----------------------------------------------------------------------------
 # Federated Identity Credentials (OIDC)
 # -----------------------------------------------------------------------------
