@@ -6,7 +6,7 @@ app:
 
 # Image
 image:
-  repository: quoteacr4a409b0a.azurecr.io/quote-app
+  repository: quoteacr4064406a.azurecr.io/quote-app
   tag: latest
   pullPolicy: Always
 
