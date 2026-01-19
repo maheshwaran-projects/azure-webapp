@@ -14,7 +14,7 @@ resource "azurerm_linux_virtual_machine" "jumpbox" {
   name                = "vm-aks-jumpbox"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-  size                = "Standard_B2s"
+  size                = "Standard_D2ls_v5"
 
   admin_username = "azureuser"
 
